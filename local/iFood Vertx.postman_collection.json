@@ -1,0 +1,44 @@
+{
+	"info": {
+		"_postman_id": "116f704a-ca73-4bb4-acab-cec6153b4952",
+		"name": "iFood Vertx",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "restaurante-command",
+			"item": [
+				{
+					"name": "Adiciona restaurante",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nomeFantasia\": \"House 360\",\n    \"descricao\": \"A melhor lanchonete de Assis e região\",\n    \"razaoSocial\": \"Jose de Oliveira ME\",\n    \"documento\": \"58.680.766/0001-44\",\n    \"formasDePagamento\": [\n        \"CARTAO\",\n        \"DINHEIRO\"\n    ],\n    \"horariosFuncionamento\": [\n        {\n            \"horaInicial\": \"11:00:00\",\n            \"horaFinal\": \"14:00:00\"\n        },\n        {\n            \"horaInicial\": \"19:00:00\",\n            \"horaFinal\": \"00:00:00\"\n        }\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://{{host}}:{{restaurant-command-port}}/api/v1/restaurantes",
+							"protocol": "http",
+							"host": [
+								"{{host}}"
+							],
+							"port": "{{restaurant-command-port}}",
+							"path": [
+								"api",
+								"v1",
+								"restaurantes"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
