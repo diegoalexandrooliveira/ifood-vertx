@@ -1,5 +1,9 @@
 package br.com.diegoalexandro.ifood.restaurante_command.application;
 
+import br.com.diegoalexandro.ifood.restaurante_command.database.DBClient;
+import br.com.diegoalexandro.ifood.restaurante_command.database.FlywayMigration;
+import br.com.diegoalexandro.ifood.restaurante_command.events.NovoRestauranteSubscriber;
+import br.com.diegoalexandro.ifood.restaurante_command.events.SalvarRestauranteSubscriber;
 import br.com.diegoalexandro.ifood.restaurante_command.http.CriaEndpoints;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
@@ -26,13 +30,24 @@ public class Starter {
           return;
         }
 
-        var port = confHandler.result().getJsonObject("http").getInteger("port", 8080);
+        JsonObject config = confHandler.result();
 
+        vertx.executeBlocking(event -> {
+          FlywayMigration.migrate(config);
+          event.complete();
+        });
+
+        var port = config.getJsonObject("http").getInteger("port", 8080);
         vertx.createHttpServer()
           .requestHandler(getRouter(vertx))
           .listen(port)
-          .onSuccess(h -> log.info("restaurante-command iniciado na porta {}", port))
-          .onFailure(error -> log.error("Falha ao iniciar o restaurent-command.", error));
+          .onSuccess(h -> log.info("Servidor HTTP (restaurante-command) iniciado na porta {}", port))
+          .onFailure(error -> log.error("Falha ao iniciar o restaurante-command.", error));
+
+        vertx.deployVerticle(NovoRestauranteSubscriber.class.getName());
+        vertx.deployVerticle(SalvarRestauranteSubscriber.class.getName());
+
+        DBClient.build(vertx, config);
       });
   }
 

@@ -1,8 +1,10 @@
 package br.com.diegoalexandro.ifood.restaurante_command.http;
 
 
+import br.com.diegoalexandro.ifood.restaurante_command.events.Eventos;
 import io.vertx.core.Handler;
 import io.vertx.core.json.Json;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -16,7 +18,11 @@ class AdicionaRestauranteHandler {
     return routingContext -> {
       var novoRestauranteRequest = Json.decodeValue(routingContext.getBodyAsString(), NovoRestauranteRequest.class);
       log.info("Recebendo requisição de um novo restaurante {}", novoRestauranteRequest);
-      routingContext.response().setStatusCode(201).end();
+      routingContext.vertx().eventBus()
+        .request(Eventos.NOVO_RESTAURANTE.toString(), Json.encode(novoRestauranteRequest))
+        .onSuccess(handler -> routingContext.response().setStatusCode(201).end())
+        .onFailure(errorHandler -> routingContext.response().setStatusCode(500)
+          .end(new JsonObject().put("error", "Falha ao inserir o restaurante.").encodePrettily()));
     };
   }
 

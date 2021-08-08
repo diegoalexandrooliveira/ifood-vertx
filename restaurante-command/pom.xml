@@ -39,6 +39,7 @@
   </dependencyManagement>
 
   <dependencies>
+    <!-- VERTX -->
     <dependency>
       <groupId>io.vertx</groupId>
       <artifactId>vertx-web-validation</artifactId>
@@ -123,6 +124,18 @@
       <version>${logback.version}</version>
     </dependency>
 
+
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+      <version>7.12.1</version>
+    </dependency>
+    <!-- Apenas para uso do Flyway -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.2.23</version>
+    </dependency>
 
   </dependencies>
 
