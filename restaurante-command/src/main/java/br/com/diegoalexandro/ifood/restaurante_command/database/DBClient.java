@@ -1,17 +1,18 @@
 package br.com.diegoalexandro.ifood.restaurante_command.database;
 
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgConnectOptions;
 import io.vertx.pgclient.PgPool;
-import io.vertx.sqlclient.PoolOptions;
-import io.vertx.sqlclient.SqlClient;
+import io.vertx.sqlclient.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
@@ -19,11 +20,19 @@ public class DBClient {
 
   @Getter
   private static DBClient INSTANCE;
-  @Getter
-  private SqlClient sqlClient;
+
+  private PgPool pgPool;
 
   private PoolOptions poolOptions;
   private PgConnectOptions pgConnectOptions;
+
+  public PreparedQuery<RowSet<Row>> preparedQuery(String query) {
+    return pgPool.preparedQuery(query);
+  }
+
+  public <T> Future<T> transaction(Function<SqlConnection, Future<T>> handler) {
+    return pgPool.withTransaction(handler);
+  }
 
   public static void build(Vertx vertx, JsonObject config) {
     log.info("Iniciando conexão com o banco de dados.");
@@ -49,7 +58,7 @@ public class DBClient {
 
     INSTANCE.poolOptions = new PoolOptions().setMaxSize(10);
 
-    INSTANCE.sqlClient = PgPool.pool(vertx, INSTANCE.pgConnectOptions, INSTANCE.poolOptions);
+    INSTANCE.pgPool = PgPool.pool(vertx, INSTANCE.pgConnectOptions, INSTANCE.poolOptions);
   }
 
 
