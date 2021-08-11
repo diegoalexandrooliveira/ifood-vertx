@@ -1,0 +1,5 @@
+docker run -d --name=zookeeper -e ZOOKEEPER_CLIENT_PORT=2181 -e ZOOKEEPER_TICK_TIME=2000 -p 2181:2181 confluentinc/cp-zookeeper:6.2.0
+
+docker run -d --name broker -p 9092:9092 -p 9101:9101 -e KAFKA_ZOOKEEPER_CONNECT=172.17.0.1:2181 -e KAFKA_BROKER_ID=1 -e KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://172.17.0.1:9092 confluentinc/cp-server:6.2.0
+
+docker run -d --name kafdrop -p 9000:9000 -e KAFKA_BROKERCONNECT=172.17.0.1:9092 -e JVM_OPTS="-Xms32M -Xmx64M" -e SERVER_SERVLET_CONTEXTPATH="/" obsidiandynamics/kafdrop:latest
