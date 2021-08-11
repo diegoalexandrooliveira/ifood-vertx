@@ -9,6 +9,7 @@ import br.com.diegoalexandro.ifood.restaurante_command.kafka.RestauranteProducer
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.jackson.DatabindCodec;
@@ -47,7 +48,7 @@ public class Starter {
 
         vertx.deployVerticle(NovoRestauranteSubscriber.class.getName());
         vertx.deployVerticle(SalvarRestauranteSubscriber.class.getName());
-        vertx.deployVerticle(RestauranteProducer.class.getName());
+        vertx.deployVerticle(RestauranteProducer.class.getName(), new DeploymentOptions().setConfig(config));
 
         DBClient.build(vertx, config);
       });

@@ -26,7 +26,7 @@ public class NovoRestauranteSubscriber extends AbstractVerticle {
         final var restaurante = converteRestaurante(novoRestauranteRequest);
 
         eventBus.request(Eventos.SALVAR_RESTAURANTE.toString(), Json.encode(restaurante))
-          .onSuccess(handler -> restauranteHandler.reply(null))
+          .onSuccess(success -> restauranteHandler.reply(success.body().toString()))
           .onFailure(handler -> restauranteHandler.fail(500, handler.getMessage()));
       });
   }

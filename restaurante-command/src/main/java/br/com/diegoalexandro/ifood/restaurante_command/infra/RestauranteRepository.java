@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -36,6 +37,17 @@ public class RestauranteRepository {
           log.error("Erro ao inserir restaurante. {}", error.getMessage());
           handler.fail(error);
         }));
+  }
+
+  public static Future<Restaurante> insert(final Restaurante restaurante, Function<Restaurante, Future<Restaurante>> beforeCommit) {
+    return
+      DBClient
+        .getINSTANCE()
+        .transaction(sqlConnection -> getNextId(sqlConnection)
+          .compose(idRestaurante -> insertRestaurante(restaurante, sqlConnection, idRestaurante))
+          .compose(idRestaurante -> insertFormasDePagamento(restaurante, sqlConnection))
+          .compose(idRestaurante -> insertHorarios(restaurante, sqlConnection))
+          .compose(beforeCommit));
   }
 
   private static Future<Long> getNextId(final SqlConnection sqlConnection) {

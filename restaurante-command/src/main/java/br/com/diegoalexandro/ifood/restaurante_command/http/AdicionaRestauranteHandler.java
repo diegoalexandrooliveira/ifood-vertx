@@ -20,7 +20,7 @@ class AdicionaRestauranteHandler {
       log.info("Recebendo requisição de um novo restaurante {}", novoRestauranteRequest);
       routingContext.vertx().eventBus()
         .request(Eventos.NOVO_RESTAURANTE.toString(), Json.encode(novoRestauranteRequest))
-        .onSuccess(handler -> routingContext.response().setStatusCode(201).end())
+        .onSuccess(handler -> routingContext.response().putHeader("Content-Type", "application/json").setStatusCode(200).end(handler.body().toString()))
         .onFailure(errorHandler -> routingContext.response().setStatusCode(500)
           .end(new JsonObject().put("error", "Falha ao inserir o restaurante.").encodePrettily()));
     };
