@@ -5,6 +5,7 @@ import br.com.diegoalexandro.ifood.restaurante_command.database.FlywayMigration;
 import br.com.diegoalexandro.ifood.restaurante_command.events.NovoRestauranteSubscriber;
 import br.com.diegoalexandro.ifood.restaurante_command.events.SalvarRestauranteSubscriber;
 import br.com.diegoalexandro.ifood.restaurante_command.http.CriaEndpoints;
+import br.com.diegoalexandro.ifood.restaurante_command.kafka.RestauranteProducer;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
@@ -46,6 +47,7 @@ public class Starter {
 
         vertx.deployVerticle(NovoRestauranteSubscriber.class.getName());
         vertx.deployVerticle(SalvarRestauranteSubscriber.class.getName());
+        vertx.deployVerticle(RestauranteProducer.class.getName());
 
         DBClient.build(vertx, config);
       });

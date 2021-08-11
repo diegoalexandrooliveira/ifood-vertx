@@ -1,9 +1,6 @@
 package br.com.diegoalexandro.ifood.restaurante_command.domain;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +11,9 @@ import java.util.Objects;
 @Getter
 @ToString
 public class Restaurante {
+
+  @Setter
+  private Long id;
 
   private String nomeFantasia;
 
@@ -33,6 +33,7 @@ public class Restaurante {
   }
 
   public static final class RestauranteBuilder {
+    private Long id;
     private String nomeFantasia;
     private String descricao;
     private String razaoSocial;
@@ -41,6 +42,11 @@ public class Restaurante {
     private List<HorarioDeFuncionamento> horariosFuncionamento;
 
     private RestauranteBuilder() {
+    }
+
+    public RestauranteBuilder id(Long id) {
+      this.id = id;
+      return this;
     }
 
     public RestauranteBuilder nomeFantasia(String nomeFantasia) {
@@ -75,6 +81,7 @@ public class Restaurante {
 
     public Restaurante build() {
       var restaurante = new Restaurante();
+      restaurante.id = id;
       restaurante.formasDePagamento = Objects.isNull(this.formasDePagamento) ? Collections.emptyList() : Collections.unmodifiableList(this.formasDePagamento);
       restaurante.nomeFantasia = this.nomeFantasia;
       restaurante.descricao = this.descricao;

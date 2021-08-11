@@ -18,6 +18,7 @@ public class SalvarRestauranteSubscriber extends AbstractVerticle {
         log.info("Iniciando a persistencia do resturante {}", restaurante);
         RestauranteRepository
           .insert(restaurante)
+          .compose(restauranteSalvo -> eventBus.request(Eventos.ENVIAR_RESTAURANTE.toString(), Json.encode(restauranteSalvo)))
           .onSuccess(insertHandler -> messageHandler.reply(null))
           .onFailure(errorHandler -> messageHandler.fail(500, errorHandler.getMessage()));
       });
