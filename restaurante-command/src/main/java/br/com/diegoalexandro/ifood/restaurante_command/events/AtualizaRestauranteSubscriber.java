@@ -12,15 +12,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class NovoRestauranteSubscriber extends AbstractVerticle {
+public class AtualizaRestauranteSubscriber extends AbstractVerticle {
 
   @Override
   public void start() {
     var eventBus = vertx.eventBus();
-    eventBus.<String>consumer(Eventos.NOVO_RESTAURANTE.toString())
+    eventBus.<String>consumer(Eventos.ATUALIZA_RESTAURANTE.toString())
       .handler(restauranteHandler -> {
 
-        log.info("Recebendo NovoRestauranteRequest, realizando mapeamento do objeto.");
+        log.info("Recebendo RestauranteRequest, realizando mapeamento do objeto.");
 
         final var novoRestauranteRequest = Json.decodeValue(restauranteHandler.body(), RestauranteRequest.class);
         final var restaurante = converteRestaurante(novoRestauranteRequest);

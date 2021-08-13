@@ -27,7 +27,7 @@ public class CriaEndpoints {
     var validationHandler = ValidationHandler
       .builder(schemaParser)
       .predicate(RequestPredicate.BODY_REQUIRED)
-      .predicate(NovoRestauranteRequest.validacao())
+      .predicate(RestauranteRequest.validacao())
       .build();
 
     router.route(HttpMethod.POST, "/api/v1/restaurantes")
@@ -35,7 +35,7 @@ public class CriaEndpoints {
       .handler(validationHandler)
       .handler(AdicionaRestauranteHandler.handle());
 
-    router.route(HttpMethod.PUT, "/api/v1/restaurantes/{id}")
+    router.route(HttpMethod.PUT, "/api/v1/restaurantes/:id")
       .handler(BodyHandler.create())
       .handler(AtualizaRestauranteHandler.handle());
 

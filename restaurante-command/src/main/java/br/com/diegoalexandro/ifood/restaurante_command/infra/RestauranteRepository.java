@@ -4,6 +4,7 @@ import br.com.diegoalexandro.ifood.restaurante_command.database.DBClient;
 import br.com.diegoalexandro.ifood.restaurante_command.domain.Restaurante;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
+import io.vertx.sqlclient.Row;
 import io.vertx.sqlclient.SqlConnection;
 import io.vertx.sqlclient.Tuple;
 import lombok.AccessLevel;
@@ -18,10 +19,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class RestauranteRepository {
 
-  private static final String INSERT_RESTAURANTE = "insert into restaurante (id, nome_fantasia, razao_social, documento, descricao) values ($1, $2, $3, $4, $5)";
+  private static final String INSERT_RESTAURANTE = "insert into restaurante (id, nome_fantasia, razao_social, documento, descricao, ativo) values ($1, $2, $3, $4, $5, $6)";
   private static final String INSERT_FORMA_PAGAMENTO = "insert into forma_pagamento_restaurante (id_restaurante, forma_pagamento) values ($1, $2)";
   private static final String INSERT_HORARIO_FUNCIONAMENTO = "insert into horario_funcionamento_restaurante (id_restaurante, hora_inicial, hora_final) values ($1, $2, $3)";
   private static final String SELECT_NEXT_ID = "select nextval('restaurante_id')";
+  private static final String SELECT_COUNT = "select count(*) from restaurante where id = $1 and ativo = 'true'";
 
 
   public static Future<Restaurante> insert(final Restaurante restaurante) {
@@ -68,7 +70,7 @@ public class RestauranteRepository {
     restaurante.setId(idRestaurante);
     return sqlConnection
       .preparedQuery(INSERT_RESTAURANTE)
-      .execute(Tuple.of(idRestaurante, restaurante.getNomeFantasia(), restaurante.getRazaoSocial(), restaurante.getDocumento(), restaurante.getDescricao()))
+      .execute(Tuple.of(idRestaurante, restaurante.getNomeFantasia(), restaurante.getRazaoSocial(), restaurante.getDocumento(), restaurante.getDescricao(), restaurante.isAtivo()))
       .map(restaurante);
   }
 
@@ -94,5 +96,19 @@ public class RestauranteRepository {
       .collect(Collectors.toList());
 
     return CompositeFuture.all(todosInsertsForma).map(restaurante);
+  }
+
+  public static Future<Long> findById(Long id) {
+    return DBClient
+      .getINSTANCE()
+      .preparedQuery(SELECT_COUNT)
+      .execute(Tuple.of(id))
+      .map(rows -> {
+        Long count = 0L;
+        for (Row row : rows) {
+          count = row.getLong(0);
+        }
+        return count;
+      });
   }
 }

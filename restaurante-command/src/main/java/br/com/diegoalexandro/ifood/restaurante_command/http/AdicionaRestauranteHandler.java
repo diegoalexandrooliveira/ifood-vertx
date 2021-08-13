@@ -16,7 +16,7 @@ class AdicionaRestauranteHandler {
 
   static Handler<RoutingContext> handle() {
     return routingContext -> {
-      var novoRestauranteRequest = Json.decodeValue(routingContext.getBodyAsString(), NovoRestauranteRequest.class);
+      var novoRestauranteRequest = Json.decodeValue(routingContext.getBodyAsString(), RestauranteRequest.class);
       log.info("Recebendo requisição de um novo restaurante {}", novoRestauranteRequest);
       routingContext.vertx().eventBus()
         .request(Eventos.NOVO_RESTAURANTE.toString(), Json.encode(novoRestauranteRequest))

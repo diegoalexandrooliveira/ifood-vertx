@@ -3,7 +3,8 @@ id numeric not null primary key,
 nome_fantasia character varying(100),
 razao_social  character varying(100),
 documento  character varying(30),
-descricao  character varying(200)
+descricao  character varying(200),
+ativo boolean
 );
 
 create table forma_pagamento_restaurante (

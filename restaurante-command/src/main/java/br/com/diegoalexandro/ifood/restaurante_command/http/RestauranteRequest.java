@@ -5,17 +5,17 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.validation.RequestPredicate;
 import io.vertx.ext.web.validation.RequestPredicateResult;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 @ToString
-public class NovoRestauranteRequest {
+public class RestauranteRequest {
+
+  @Setter
+  private Long id;
 
   private String nomeFantasia;
 
@@ -31,12 +31,13 @@ public class NovoRestauranteRequest {
 
   public static RequestPredicate validacao() {
     return routingContext -> {
-      final var nomeFantasia = routingContext.getBodyAsJson().getString("nomeFantasia", "").trim();
-      final var descricao = routingContext.getBodyAsJson().getString("descricao", "").trim();
-      final var razaoSocial = routingContext.getBodyAsJson().getString("razaoSocial", "").trim();
-      final var documento = routingContext.getBodyAsJson().getString("documento", "").trim();
-      final var formasDePagamento = routingContext.getBodyAsJson().getJsonArray("formasDePagamento", new JsonArray());
-      final var horariosFuncionamento = routingContext.getBodyAsJson().getJsonArray("horariosFuncionamento", new JsonArray());
+      JsonObject bodyAsJson = routingContext.getBodyAsJson();
+      final var nomeFantasia = bodyAsJson.getString("nomeFantasia", "").trim();
+      final var descricao = bodyAsJson.getString("descricao", "").trim();
+      final var razaoSocial = bodyAsJson.getString("razaoSocial", "").trim();
+      final var documento = bodyAsJson.getString("documento", "").trim();
+      final var formasDePagamento = bodyAsJson.getJsonArray("formasDePagamento", new JsonArray());
+      final var horariosFuncionamento = bodyAsJson.getJsonArray("horariosFuncionamento", new JsonArray());
 
       if (nomeFantasia.isEmpty()) {
         return RequestPredicateResult.failed("Nome fantasia deve ser informado.");

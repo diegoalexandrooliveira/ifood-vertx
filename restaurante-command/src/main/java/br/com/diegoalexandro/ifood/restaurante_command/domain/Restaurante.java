@@ -27,8 +27,10 @@ public class Restaurante {
 
   private List<HorarioDeFuncionamento> horariosFuncionamento;
 
+  private boolean ativo = true;
 
-  public static RestauranteBuilder builder() {
+
+  public static RestauranteBuilder novo() {
     return new RestauranteBuilder();
   }
 
@@ -88,6 +90,7 @@ public class Restaurante {
       restaurante.razaoSocial = this.razaoSocial;
       restaurante.horariosFuncionamento = Objects.isNull(this.horariosFuncionamento) ? Collections.emptyList() : Collections.unmodifiableList(this.horariosFuncionamento);
       restaurante.documento = this.documento;
+      restaurante.ativo = true;
       return restaurante;
     }
   }
