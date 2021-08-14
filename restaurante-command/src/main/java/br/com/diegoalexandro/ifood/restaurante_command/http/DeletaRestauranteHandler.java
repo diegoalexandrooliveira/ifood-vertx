@@ -6,7 +6,6 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.ReplyException;
 import io.vertx.core.eventbus.ReplyFailure;
-import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import lombok.AccessLevel;
@@ -15,15 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
-class AtualizaRestauranteHandler {
+class DeletaRestauranteHandler {
 
   static Handler<RoutingContext> handle() {
     return routingContext -> {
       final var id = Long.valueOf(routingContext.request().getParam("id"));
-      final var restauranteRequest = Json.decodeValue(routingContext.getBodyAsString(), RestauranteRequest.class);
-      restauranteRequest.setId(id);
 
-      log.info("Recebendo requisição para atualizar o restaurante {}", restauranteRequest);
+      log.info("Recebendo requisição para excluir o restaurante {}", id);
       final var eventBus = routingContext.vertx().eventBus();
 
       eventBus.request(Eventos.RESTAURANTE_EXISTE.toString(), id.toString())
@@ -33,9 +30,9 @@ class AtualizaRestauranteHandler {
             log.error("Restaurante com id {} não existe.", id);
             return Future.failedFuture(new ReplyException(ReplyFailure.RECIPIENT_FAILURE, 400, "Restaurante não encontrado."));
           }
-          return eventBus.request(Eventos.ATUALIZA_RESTAURANTE.toString(), Json.encode(restauranteRequest));
+          return eventBus.request(Eventos.INATIVA_RESTAURANTE.toString(), id.toString());
         })
-        .onSuccess(handler -> routingContext.response().putHeader("Content-Type", "application/json").setStatusCode(200).end(handler.body().toString()))
+        .onSuccess(handler -> routingContext.response().putHeader("Content-Type", "application/json").setStatusCode(201).end())
         .onFailure(errorHandler -> montaRespostaDeErro(routingContext, errorHandler));
     };
   }
@@ -52,7 +49,7 @@ class AtualizaRestauranteHandler {
     routingContext
       .response()
       .setStatusCode(500)
-      .end(new JsonObject().put("error", "Falha ao atualizar o restaurante.").encodePrettily());
+      .end(new JsonObject().put("error", "Falha ao excluir o restaurante.").encodePrettily());
   }
 
 }

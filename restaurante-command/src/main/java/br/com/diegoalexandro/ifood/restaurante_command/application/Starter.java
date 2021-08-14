@@ -2,9 +2,7 @@ package br.com.diegoalexandro.ifood.restaurante_command.application;
 
 import br.com.diegoalexandro.ifood.restaurante_command.database.DBClient;
 import br.com.diegoalexandro.ifood.restaurante_command.database.FlywayMigration;
-import br.com.diegoalexandro.ifood.restaurante_command.events.NovoRestauranteSubscriber;
-import br.com.diegoalexandro.ifood.restaurante_command.events.RestauranteExisteSubscriber;
-import br.com.diegoalexandro.ifood.restaurante_command.events.SalvarRestauranteSubscriber;
+import br.com.diegoalexandro.ifood.restaurante_command.events.*;
 import br.com.diegoalexandro.ifood.restaurante_command.http.CriaEndpoints;
 import br.com.diegoalexandro.ifood.restaurante_command.kafka.RestauranteProducer;
 import io.vertx.config.ConfigRetriever;
@@ -48,6 +46,8 @@ public class Starter {
           .onFailure(error -> log.error("Falha ao iniciar o restaurante-command.", error));
 
         vertx.deployVerticle(NovoRestauranteSubscriber.class.getName());
+        vertx.deployVerticle(AtualizaRestauranteSubscriber.class.getName());
+        vertx.deployVerticle(InativaRestauranteSubscriber.class.getName());
         vertx.deployVerticle(SalvarRestauranteSubscriber.class.getName());
         vertx.deployVerticle(RestauranteExisteSubscriber.class.getName());
         vertx.deployVerticle(RestauranteProducer.class.getName(), new DeploymentOptions().setConfig(config));

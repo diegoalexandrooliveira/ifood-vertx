@@ -20,10 +20,10 @@ public class AtualizaRestauranteSubscriber extends AbstractVerticle {
     eventBus.<String>consumer(Eventos.ATUALIZA_RESTAURANTE.toString())
       .handler(restauranteHandler -> {
 
-        log.info("Recebendo RestauranteRequest, realizando mapeamento do objeto.");
+        log.info("Recebendo RestauranteRequest para atualização, realizando mapeamento do objeto.");
 
-        final var novoRestauranteRequest = Json.decodeValue(restauranteHandler.body(), RestauranteRequest.class);
-        final var restaurante = converteRestaurante(novoRestauranteRequest);
+        final var restauranteRequest = Json.decodeValue(restauranteHandler.body(), RestauranteRequest.class);
+        final var restaurante = converteRestaurante(restauranteRequest);
 
         eventBus.request(Eventos.SALVAR_RESTAURANTE.toString(), Json.encode(restaurante))
           .onSuccess(success -> restauranteHandler.reply(success.body().toString()))
@@ -44,7 +44,8 @@ public class AtualizaRestauranteSubscriber extends AbstractVerticle {
       .map(horario -> new HorarioDeFuncionamento(horario.getHoraInicial(), horario.getHoraFinal()))
       .collect(Collectors.toList());
 
-    return Restaurante.novo()
+    return Restaurante.build()
+      .id(restauranteRequest.getId())
       .nomeFantasia(restauranteRequest.getNomeFantasia())
       .descricao(restauranteRequest.getDescricao())
       .razaoSocial(restauranteRequest.getRazaoSocial())

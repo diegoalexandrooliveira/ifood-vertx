@@ -8,22 +8,20 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.Json;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Objects;
 import java.util.function.Function;
 
 @Slf4j
-public class SalvarRestauranteSubscriber extends AbstractVerticle {
+public class InativaRestauranteSubscriber extends AbstractVerticle {
 
   @Override
   public void start() {
     var eventBus = vertx.eventBus();
-    eventBus.<String>consumer(Eventos.SALVAR_RESTAURANTE.toString())
+    eventBus.<String>consumer(Eventos.INATIVA_RESTAURANTE.toString())
       .handler(messageHandler -> {
-        final var restaurante = Json.decodeValue(messageHandler.body(), Restaurante.class);
+        final var idRestaurante = Long.valueOf(messageHandler.body());
 
-        Future<Restaurante> persistencia = verificaOperacao(restaurante, eventBus);
-
-        persistencia
+        RestauranteRepository
+          .atualizaStatus(idRestaurante, false, enviarRestaurante(eventBus))
           .onSuccess(success -> messageHandler.reply(Json.encode(success)))
           .onFailure(errorHandler -> {
             log.error("Erro ao persistir o restaurante. {}", errorHandler.getMessage());
@@ -32,15 +30,6 @@ public class SalvarRestauranteSubscriber extends AbstractVerticle {
       });
   }
 
-  private Future<Restaurante> verificaOperacao(Restaurante restaurante, EventBus eventBus) {
-    if (Objects.nonNull(restaurante.getId())) {
-      log.info("Iniciando a atualização do resturante {}", restaurante);
-      return RestauranteRepository.update(restaurante, enviarRestaurante(eventBus));
-    }
-
-    log.info("Iniciando a inserção do resturante {}", restaurante);
-    return RestauranteRepository.insert(restaurante, enviarRestaurante(eventBus));
-  }
 
   private Function<Restaurante, Future<Restaurante>> enviarRestaurante(EventBus eventBus) {
     return restauranteSalvo -> eventBus.request(Eventos.ENVIAR_RESTAURANTE.toString(), Json.encode(restauranteSalvo))

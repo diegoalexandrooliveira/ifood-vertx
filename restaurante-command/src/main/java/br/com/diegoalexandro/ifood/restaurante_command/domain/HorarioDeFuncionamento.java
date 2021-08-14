@@ -1,6 +1,7 @@
 package br.com.diegoalexandro.ifood.restaurante_command.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.NonNull;
@@ -12,8 +13,10 @@ import java.time.LocalTime;
 @ToString
 public class HorarioDeFuncionamento {
 
+  @JsonFormat(pattern = "HH:mm:ss")
   private final LocalTime horaInicial;
 
+  @JsonFormat(pattern = "HH:mm:ss")
   private final LocalTime horaFinal;
 
   @JsonCreator

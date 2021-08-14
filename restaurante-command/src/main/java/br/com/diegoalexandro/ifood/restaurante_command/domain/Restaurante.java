@@ -23,14 +23,22 @@ public class Restaurante {
 
   private String documento;
 
+  @Setter
   private List<FormaDePagamento> formasDePagamento;
-
+  @Setter
   private List<HorarioDeFuncionamento> horariosFuncionamento;
 
   private boolean ativo = true;
 
+  public List<FormaDePagamento> getFormasDePagamento() {
+    return Objects.isNull(formasDePagamento) ? Collections.emptyList() : formasDePagamento;
+  }
 
-  public static RestauranteBuilder novo() {
+  public List<HorarioDeFuncionamento> getHorariosFuncionamento() {
+    return Objects.isNull(horariosFuncionamento) ? Collections.emptyList() : horariosFuncionamento;
+  }
+
+  public static RestauranteBuilder build() {
     return new RestauranteBuilder();
   }
 
@@ -40,6 +48,7 @@ public class Restaurante {
     private String descricao;
     private String razaoSocial;
     private String documento;
+    private Boolean ativo;
     private List<FormaDePagamento> formasDePagamento;
     private List<HorarioDeFuncionamento> horariosFuncionamento;
 
@@ -71,6 +80,11 @@ public class Restaurante {
       return this;
     }
 
+    public RestauranteBuilder ativo(boolean ativo) {
+      this.ativo = ativo;
+      return this;
+    }
+
     public RestauranteBuilder formasDePagamento(List<FormaDePagamento> formasDePagamento) {
       this.formasDePagamento = formasDePagamento;
       return this;
@@ -90,7 +104,7 @@ public class Restaurante {
       restaurante.razaoSocial = this.razaoSocial;
       restaurante.horariosFuncionamento = Objects.isNull(this.horariosFuncionamento) ? Collections.emptyList() : Collections.unmodifiableList(this.horariosFuncionamento);
       restaurante.documento = this.documento;
-      restaurante.ativo = true;
+      restaurante.ativo = Objects.isNull(this.ativo) || this.ativo;
       return restaurante;
     }
   }

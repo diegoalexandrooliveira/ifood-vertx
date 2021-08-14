@@ -37,7 +37,11 @@ public class CriaEndpoints {
 
     router.route(HttpMethod.PUT, "/api/v1/restaurantes/:id")
       .handler(BodyHandler.create())
+      .handler(validationHandler)
       .handler(AtualizaRestauranteHandler.handle());
+
+    router.route(HttpMethod.DELETE, "/api/v1/restaurantes/:id")
+      .handler(DeletaRestauranteHandler.handle());
 
     router.errorHandler(400, routingContext -> routingContext.response().setStatusCode(400).end(new JsonObject().put("error", routingContext.failure().getMessage()).encodePrettily()));
 

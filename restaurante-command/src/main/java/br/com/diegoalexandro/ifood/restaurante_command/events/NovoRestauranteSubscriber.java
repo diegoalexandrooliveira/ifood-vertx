@@ -44,7 +44,7 @@ public class NovoRestauranteSubscriber extends AbstractVerticle {
       .map(horario -> new HorarioDeFuncionamento(horario.getHoraInicial(), horario.getHoraFinal()))
       .collect(Collectors.toList());
 
-    return Restaurante.novo()
+    return Restaurante.build()
       .nomeFantasia(restauranteRequest.getNomeFantasia())
       .descricao(restauranteRequest.getDescricao())
       .razaoSocial(restauranteRequest.getRazaoSocial())

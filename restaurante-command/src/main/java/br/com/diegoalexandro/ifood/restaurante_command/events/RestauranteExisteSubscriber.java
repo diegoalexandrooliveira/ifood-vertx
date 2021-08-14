@@ -15,7 +15,7 @@ public class RestauranteExisteSubscriber extends AbstractVerticle {
         final var id = Long.valueOf(messageHandler.body());
         log.info("Verificando se o resturante id {} existe.", id);
 
-        RestauranteRepository.findById(id)
+        RestauranteRepository.countById(id)
           .onSuccess(restaurante -> messageHandler.reply(restaurante > 0))
           .onFailure(error -> messageHandler.fail(500, error.getMessage()));
       });

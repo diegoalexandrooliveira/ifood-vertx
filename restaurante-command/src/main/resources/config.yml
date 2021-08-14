@@ -8,7 +8,7 @@ database:
   password: postgres
 
 kafka:
-  bootstrap-servers: 172.17.0.1:9092
+  bootstrap-servers: 172.17.0.1:29092
   key-serializer: org.apache.kafka.common.serialization.StringSerializer
   value-serializer: org.apache.kafka.common.serialization.StringSerializer
   restaurante-topic: Restaurantes
