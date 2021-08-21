@@ -21,9 +21,9 @@ public class SalvarRestauranteSubscriber extends AbstractVerticle {
       .handler(messageHandler -> {
         final var restaurante = Json.decodeValue(messageHandler.body(), Restaurante.class);
 
-        Future<Restaurante> persistencia = verificaOperacao(restaurante, eventBus);
+        Future<Restaurante> operacaoPersistencia = verificaOperacao(restaurante, eventBus);
 
-        persistencia
+        operacaoPersistencia
           .onSuccess(success -> messageHandler.reply(Json.encode(success)))
           .onFailure(errorHandler -> {
             log.error("Erro ao persistir o restaurante. {}", errorHandler.getMessage());

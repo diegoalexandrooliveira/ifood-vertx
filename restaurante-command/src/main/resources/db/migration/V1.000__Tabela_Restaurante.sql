@@ -1,5 +1,5 @@
 create table restaurante (
-id numeric not null primary key,
+id bigint not null primary key,
 nome_fantasia character varying(100),
 razao_social  character varying(100),
 documento  character varying(30),
@@ -8,14 +8,14 @@ ativo boolean
 );
 
 create table forma_pagamento_restaurante (
-id_restaurante numeric,
+id_restaurante bigint,
 forma_pagamento  character varying(100)
 );
 
 alter table forma_pagamento_restaurante add constraint forma_pagamento_restaurante_fk foreign key (id_restaurante) references restaurante (id);
 
 create table horario_funcionamento_restaurante (
-id_restaurante numeric,
+id_restaurante bigint,
 hora_inicial  time,
 hora_final  time
 );
