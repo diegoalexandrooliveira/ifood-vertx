@@ -2,8 +2,11 @@ package br.com.diegoalexandro.ifood.produto_command.application;
 
 import br.com.diegoalexandro.ifood.produto_command.database.DBClient;
 import br.com.diegoalexandro.ifood.produto_command.database.FlywayMigration;
+import br.com.diegoalexandro.ifood.produto_command.events.NovoProdutoSubscriber;
 import br.com.diegoalexandro.ifood.produto_command.events.RestauranteRecebidoSubscriber;
+import br.com.diegoalexandro.ifood.produto_command.events.SalvarProdutoSubscriber;
 import br.com.diegoalexandro.ifood.produto_command.http.CriaEndpoints;
+import br.com.diegoalexandro.ifood.produto_command.kafka.ProdutoProducer;
 import br.com.diegoalexandro.ifood.produto_command.kafka.RestauranteConsumer;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
@@ -46,6 +49,9 @@ public class Starter {
           .onFailure(error -> log.error("Falha ao iniciar o produto-command.", error));
 
         vertx.deployVerticle(RestauranteRecebidoSubscriber.class.getName());
+        vertx.deployVerticle(NovoProdutoSubscriber.class.getName());
+        vertx.deployVerticle(SalvarProdutoSubscriber.class.getName());
+        vertx.deployVerticle(ProdutoProducer.class.getName(), new DeploymentOptions().setConfig(config));
         vertx.deployVerticle(RestauranteConsumer.class.getName(), new DeploymentOptions().setConfig(config));
 
         DBClient.build(vertx, config);

@@ -38,21 +38,6 @@ public class RestauranteRepository {
   private static final String SELECT_HORARIO_FUNCIONAMENTO = "select id_restaurante, hora_inicial, hora_final from horario_funcionamento_restaurante where id_restaurante = $1";
 
 
-  public static Future<Restaurante> insert(final Restaurante restaurante) {
-    return Future.future(handler ->
-      DBClient
-        .getINSTANCE()
-        .transaction(sqlConnection -> getNextId(sqlConnection)
-          .compose(idRestaurante -> insertRestaurante(restaurante, sqlConnection, idRestaurante))
-          .compose(idRestaurante -> insertFormasDePagamento(restaurante, sqlConnection))
-          .compose(idRestaurante -> insertHorarios(restaurante, sqlConnection)))
-        .onSuccess(handler::complete)
-        .onFailure(error -> {
-          log.error("Erro ao inserir restaurante. {}", error.getMessage());
-          handler.fail(error);
-        }));
-  }
-
   public static Future<Restaurante> insert(final Restaurante restaurante, Function<Restaurante, Future<Restaurante>> beforeCommit) {
     return
       DBClient

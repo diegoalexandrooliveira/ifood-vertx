@@ -1,10 +1,7 @@
 package br.com.diegoalexandro.ifood.produto_command.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -21,4 +18,15 @@ public class Restaurante {
 
   private boolean ativo;
 
+  public Restaurante(@NonNull Long id) {
+    this.id = id;
+    this.ativo = true;
+  }
+
+  public Restaurante(@NonNull Long id, @NonNull String nomeFantasia, @NonNull String documento, boolean ativo) {
+    this.id = id;
+    this.nomeFantasia = nomeFantasia;
+    this.documento = documento;
+    this.ativo = ativo;
+  }
 }

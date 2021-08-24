@@ -21,29 +21,21 @@ public class CriaEndpoints {
   public static Router criar(final Vertx vertx) {
     final var router = Router.router(vertx);
 
-//    var schemaRouter = SchemaRouter.create(vertx, new SchemaRouterOptions());
-//    var schemaParser = SchemaParser.createDraft201909SchemaParser(schemaRouter);
-//
-//    var validationHandler = ValidationHandler
-//      .builder(schemaParser)
-//      .predicate(RequestPredicate.BODY_REQUIRED)
-//      .predicate(RestauranteRequest.validacao())
-//      .build();
-//
-//    router.route(HttpMethod.POST, "/api/v1/restaurantes")
-//      .handler(BodyHandler.create())
-//      .handler(validationHandler)
-//      .handler(AdicionaRestauranteHandler.handle());
-//
-//    router.route(HttpMethod.PUT, "/api/v1/restaurantes/:id")
-//      .handler(BodyHandler.create())
-//      .handler(validationHandler)
-//      .handler(AtualizaRestauranteHandler.handle());
-//
-//    router.route(HttpMethod.DELETE, "/api/v1/restaurantes/:id")
-//      .handler(DeletaRestauranteHandler.handle());
-//
-//    router.errorHandler(400, routingContext -> routingContext.response().setStatusCode(400).end(new JsonObject().put("error", routingContext.failure().getMessage()).encodePrettily()));
+    var schemaRouter = SchemaRouter.create(vertx, new SchemaRouterOptions());
+    var schemaParser = SchemaParser.createDraft201909SchemaParser(schemaRouter);
+
+    var validationHandler = ValidationHandler
+      .builder(schemaParser)
+      .predicate(RequestPredicate.BODY_REQUIRED)
+      .predicate(ProdutoRequest.validacao())
+      .build();
+
+    router.route(HttpMethod.POST, "/api/v1/restaurantes/:idRestaurante/produtos")
+      .handler(BodyHandler.create())
+      .handler(validationHandler)
+      .handler(AdicionaProdutoHandler.handle());
+
+    router.errorHandler(400, routingContext -> routingContext.response().setStatusCode(400).end(new JsonObject().put("error", routingContext.failure().getMessage()).encodePrettily()));
 
     return router;
   }
