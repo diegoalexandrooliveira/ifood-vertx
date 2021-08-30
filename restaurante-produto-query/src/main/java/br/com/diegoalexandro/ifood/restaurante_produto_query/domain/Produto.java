@@ -80,18 +80,18 @@ public class Produto {
       return this;
     }
 
-    public Produto build() {
-      Produto produto = new Produto();
-      produto.restaurante = Objects.nonNull(idRestaurante) && idRestaurante != 0 ? new Restaurante(idRestaurante) : null;
-      if (Objects.nonNull(this.restaurante)) {
-        produto.restaurante = this.restaurante;
-      }
-      produto.nome = this.nome;
-      produto.descricao = this.descricao;
-      produto.valor = this.valor;
-      produto.id = this.id;
-      Objects.requireNonNull(produto.restaurante);
-      return produto;
-    }
+//    public Produto build() {
+//      Produto produto = new Produto();
+//      produto.restaurante = Objects.nonNull(idRestaurante) && idRestaurante != 0 ? new Restaurante(idRestaurante) : null;
+//      if (Objects.nonNull(this.restaurante)) {
+//        produto.restaurante = this.restaurante;
+//      }
+//      produto.nome = this.nome;
+//      produto.descricao = this.descricao;
+//      produto.valor = this.valor;
+//      produto.id = this.id;
+//      Objects.requireNonNull(produto.restaurante);
+//      return produto;
+//    }
   }
 }

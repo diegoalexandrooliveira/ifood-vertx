@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.*;
 
 import java.util.List;
+import java.util.Set;
 
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -21,14 +22,5 @@ public class Restaurante {
 
   private List<HorarioDeFuncionamento> horariosFuncionamento;
 
-  public Restaurante(@NonNull Long id) {
-    this.id = id;
-    this.ativo = true;
-  }
-
-  public Restaurante(@NonNull Long id, @NonNull String nomeFantasia, boolean ativo) {
-    this.id = id;
-    this.nomeFantasia = nomeFantasia;
-    this.ativo = ativo;
-  }
+  private Set<FormaDePagamento> formasDePagamento;
 }

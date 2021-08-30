@@ -16,9 +16,8 @@ public class CriaEndpoints {
   public static Router criar(final Vertx vertx) {
     final var router = Router.router(vertx);
 
-    router.route(HttpMethod.POST, "/api/v1/restaurantes/:idRestaurante/produtos")
-      .handler(BodyHandler.create())
-      .handler(AdicionaProdutoHandler.handle());
+    router.route(HttpMethod.GET, "/api/v1/restaurantes")
+      .handler(RecuperaRestaurantesHandler.handle());
 
     router.errorHandler(400, routingContext -> routingContext.response().setStatusCode(400).end(new JsonObject().put("error", routingContext.failure().getMessage()).encodePrettily()));
 

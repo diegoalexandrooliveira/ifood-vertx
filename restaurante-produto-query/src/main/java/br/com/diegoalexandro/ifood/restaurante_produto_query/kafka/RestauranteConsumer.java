@@ -31,8 +31,8 @@ public class RestauranteConsumer extends AbstractVerticle {
     final var topicPartition = new TopicPartition();
     topicPartition.setTopic(config.getString("restaurante-topic"));
     consumer.assign(topicPartition)
-      .onSuccess(assign -> vertx.setPeriodic(1_000, idPeriodic ->
-          consumer.poll(Duration.ofSeconds(1))
+      .onSuccess(assign -> vertx.setPeriodic(800, idPeriodic ->
+          consumer.poll(Duration.ofMillis(500))
             .onSuccess(kafkaHandler ->
               consumer.pause(topicPartition)
                 .compose(paused -> getMensagens(kafkaHandler))
@@ -79,7 +79,7 @@ public class RestauranteConsumer extends AbstractVerticle {
     kafkaProperties.put("group.id", config.getString("group-id", "restaurante-produto-query"));
     kafkaProperties.put("auto.offset.reset", config.getString("auto-offset-reset", "earliest"));
     kafkaProperties.put("enable.auto.commit", "false");
-    kafkaProperties.put("max.poll.records", config.getInteger("max.poll.records", 10).toString());
+    kafkaProperties.put("max.poll.records", config.getInteger("max.poll.records", 1).toString());
     return KafkaConsumer.create(vertx, kafkaProperties);
   }
 }
