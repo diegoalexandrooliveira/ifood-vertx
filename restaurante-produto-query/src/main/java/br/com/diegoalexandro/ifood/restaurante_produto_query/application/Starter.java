@@ -1,8 +1,10 @@
 package br.com.diegoalexandro.ifood.restaurante_produto_query.application;
 
 import br.com.diegoalexandro.ifood.restaurante_produto_query.database.RedisClient;
+import br.com.diegoalexandro.ifood.restaurante_produto_query.events.ProdutoRecebidoSubscriber;
 import br.com.diegoalexandro.ifood.restaurante_produto_query.events.RestauranteRecebidoSubscriber;
 import br.com.diegoalexandro.ifood.restaurante_produto_query.http.CriaEndpoints;
+import br.com.diegoalexandro.ifood.restaurante_produto_query.kafka.ProdutoConsumer;
 import br.com.diegoalexandro.ifood.restaurante_produto_query.kafka.RestauranteConsumer;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
@@ -44,10 +46,9 @@ public class Starter {
           .onFailure(error -> log.error("Falha ao conectar no Redis.", error));
 
         vertx.deployVerticle(RestauranteRecebidoSubscriber.class.getName());
-//        vertx.deployVerticle(NovoProdutoSubscriber.class.getName());
-//        vertx.deployVerticle(SalvarProdutoSubscriber.class.getName());
-//        vertx.deployVerticle(ProdutoProducer.class.getName(), new DeploymentOptions().setConfig(config));
+        vertx.deployVerticle(ProdutoRecebidoSubscriber.class.getName());
         vertx.deployVerticle(RestauranteConsumer.class.getName(), new DeploymentOptions().setConfig(config));
+        vertx.deployVerticle(ProdutoConsumer.class.getName(), new DeploymentOptions().setConfig(config));
 
       });
   }

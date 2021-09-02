@@ -1,7 +1,7 @@
 package br.com.diegoalexandro.ifood.restaurante_produto_query.http;
 
 
-import br.com.diegoalexandro.ifood.restaurante_produto_query.infra.RestauranteRepository;
+import br.com.diegoalexandro.ifood.restaurante_produto_query.infra.ProdutoRepository;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.ReplyException;
 import io.vertx.core.json.Json;
@@ -13,14 +13,15 @@ import lombok.extern.slf4j.Slf4j;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
-class RecuperaRestaurantesHandler {
+class RecuperaProdutosHandler {
 
   static Handler<RoutingContext> handle() {
     return routingContext -> {
-      RestauranteRepository
-        .recuperarTodos()
-        .onSuccess(restaurantes -> routingContext.response().putHeader("Content-Type", "application/json")
-          .setStatusCode(200).end(Json.encode(restaurantes)))
+      final var idResurante = routingContext.request().getParam("idRestaurante");
+      ProdutoRepository
+        .recuperaProdutosPorRestaurante(Long.valueOf(idResurante))
+        .onSuccess(produtos -> routingContext.response().putHeader("Content-Type", "application/json")
+          .setStatusCode(200).end(Json.encode(produtos)))
         .onFailure(error -> montaRespostaDeErro(routingContext, error));
     };
   }
@@ -37,7 +38,7 @@ class RecuperaRestaurantesHandler {
     routingContext
       .response()
       .setStatusCode(500)
-      .end(new JsonObject().put("error", "Falha ao recupera os restaurantes.").encodePrettily());
+      .end(new JsonObject().put("error", "Falha ao recuperar os produtos do restaurante.").encodePrettily());
   }
 
 }

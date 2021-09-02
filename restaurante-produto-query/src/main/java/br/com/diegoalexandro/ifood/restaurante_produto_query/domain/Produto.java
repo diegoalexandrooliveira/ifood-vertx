@@ -1,7 +1,8 @@
 package br.com.diegoalexandro.ifood.restaurante_produto_query.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonSetter;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -9,89 +10,45 @@ import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @ToString
 @EqualsAndHashCode(of = "id")
 public class Produto {
 
-  @Setter
+  @Getter
   private Long id;
 
-  private Restaurante restaurante;
+  private Produto.Restaurante restaurante;
 
+  @Getter
   private String nome;
 
+  @Getter
   private String descricao;
 
+  @Getter
   private BigDecimal valor;
 
-  @JsonIgnore
-  public Long getIdRestaurante() {
-    return Objects.nonNull(restaurante) ? restaurante.getId() : 0L;
+  @Getter
+  private Long idRestaurante;
+
+  @JsonSetter
+  public void setRestaurante(Restaurante restaurante) {
+    this.idRestaurante = Objects.isNull(restaurante) ? 0L : restaurante.getId();
   }
 
-  public void setRestaurante(@NonNull Restaurante restaurante) {
-    this.restaurante = restaurante;
+  public void preparaParaSerializar() {
+    idRestaurante = null;
+    restaurante = null;
   }
 
-  public static ProdutoBuilder builder() {
-    return new ProdutoBuilder();
-  }
+  @NoArgsConstructor(access = AccessLevel.PRIVATE)
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  static class Restaurante {
 
-  public static final class ProdutoBuilder {
+    @Getter
     private Long id;
-    private Restaurante restaurante;
-    private Long idRestaurante;
-    private String nome;
-    private String descricao;
-    private BigDecimal valor;
 
-    private ProdutoBuilder() {
-    }
-
-
-    public ProdutoBuilder id(Long id) {
-      this.id = id;
-      return this;
-    }
-
-    public ProdutoBuilder idRestaurante(Long idRestaurante) {
-      this.idRestaurante = idRestaurante;
-      return this;
-    }
-
-    public ProdutoBuilder restaurante(Restaurante restaurante) {
-      this.restaurante = restaurante;
-      return this;
-    }
-
-    public ProdutoBuilder nome(String nome) {
-      this.nome = nome;
-      return this;
-    }
-
-    public ProdutoBuilder descricao(String descricao) {
-      this.descricao = descricao;
-      return this;
-    }
-
-    public ProdutoBuilder valor(BigDecimal valor) {
-      this.valor = valor;
-      return this;
-    }
-
-//    public Produto build() {
-//      Produto produto = new Produto();
-//      produto.restaurante = Objects.nonNull(idRestaurante) && idRestaurante != 0 ? new Restaurante(idRestaurante) : null;
-//      if (Objects.nonNull(this.restaurante)) {
-//        produto.restaurante = this.restaurante;
-//      }
-//      produto.nome = this.nome;
-//      produto.descricao = this.descricao;
-//      produto.valor = this.valor;
-//      produto.id = this.id;
-//      Objects.requireNonNull(produto.restaurante);
-//      return produto;
-//    }
   }
+
 }
