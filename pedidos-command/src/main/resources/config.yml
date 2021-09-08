@@ -1,0 +1,7 @@
+http:
+  port: 8083
+kafka:
+  bootstrap-servers: 172.17.0.1:29092
+  key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+  restaurante-topic: Restaurantes
