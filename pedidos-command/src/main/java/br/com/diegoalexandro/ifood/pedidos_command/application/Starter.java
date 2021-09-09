@@ -1,6 +1,7 @@
 package br.com.diegoalexandro.ifood.pedidos_command.application;
 
 import br.com.diegoalexandro.ifood.pedidos_command.database.MongoDBClient;
+import br.com.diegoalexandro.ifood.pedidos_command.events.NovoPedidoSubscriber;
 import br.com.diegoalexandro.ifood.pedidos_command.events.RestauranteRecebidoSubscriber;
 import br.com.diegoalexandro.ifood.pedidos_command.http.CriaEndpoints;
 import br.com.diegoalexandro.ifood.pedidos_command.kafka.RestauranteConsumer;
@@ -42,6 +43,7 @@ public class Starter {
         MongoDBClient.build(vertx, config);
 
         vertx.deployVerticle(RestauranteRecebidoSubscriber.class.getName());
+        vertx.deployVerticle(NovoPedidoSubscriber.class.getName());
         vertx.deployVerticle(RestauranteConsumer.class.getName(), new DeploymentOptions().setConfig(config));
 
       });
