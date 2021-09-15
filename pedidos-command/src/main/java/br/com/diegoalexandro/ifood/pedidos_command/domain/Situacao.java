@@ -1,0 +1,15 @@
+package br.com.diegoalexandro.ifood.pedidos_command.domain;
+
+public enum Situacao {
+
+  PEDIDO_CRIADO,
+  PEDIDO_CONFIRMADO,
+  PEDIDO_RECUSADO,
+  PAGAMENTO_CONFIRMADO,
+  PAGAMENTO_RECUSADO,
+  PEDIDO_DESPACHADO,
+  PROBLEMA_ENVIO_PEDIDO,
+  PEDIDO_FINALIZADO,
+  PEDIDO_CANCELADO;
+
+}

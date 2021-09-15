@@ -1,5 +1,6 @@
 package br.com.diegoalexandro.ifood.pedidos_command.events;
 
+import br.com.diegoalexandro.ifood.pedidos_command.domain.CriarPedido;
 import br.com.diegoalexandro.ifood.pedidos_command.http.PedidoRequest;
 import br.com.diegoalexandro.ifood.pedidos_command.infra.RestauranteRepository;
 import io.vertx.core.AbstractVerticle;
@@ -15,6 +16,8 @@ import java.util.UUID;
 @Slf4j
 public class NovoPedidoSubscriber extends AbstractVerticle {
 
+  public static final int UM_MINUTO_TIMEOUT = 60000;
+
   @Override
   public void start() {
     var eventBus = vertx.eventBus();
@@ -27,6 +30,7 @@ public class NovoPedidoSubscriber extends AbstractVerticle {
           .procuraPorId(pedidoRequest.getIdRestaurante())
           .compose(restauranteOptional -> {
             final var restaurante = restauranteOptional.orElse(null);
+
             if (restauranteOptional.isEmpty() || !restaurante.isAtivo()) {
               log.error("Restaurante {} não encontrado ou inativo.", pedidoRequest.getIdRestaurante());
               return Future.failedFuture(new ReplyException(ReplyFailure.RECIPIENT_FAILURE, 400, "Restaurante não encontrado ou inativo."));
@@ -38,12 +42,19 @@ public class NovoPedidoSubscriber extends AbstractVerticle {
                 String.format("Restaurante %s não aceita a forma de pagamento informada. %s", restaurante.getNomeFantasia(), pedidoRequest.getFormaDePagamento())));
             }
 
-            return Future.succeededFuture(geraId(restaurante.getId(), pedidoRequest.getIdCliente()));
+            final var idPedido = geraId(restaurante.getId(), pedidoRequest.getIdCliente());
+
+            final var pedido = CriarPedido.aPartir(pedidoRequest, restaurante, idPedido);
+
+            return Future.succeededFuture(pedido);
           })
-          //TODO montar objeto do PEDIDO
-          //TODO event bus para salvar PEDIDO
-          //TODO event bus para enviar PEDIDO no topico
-          .onSuccess(novoPedidoHandler::reply)
+          .compose(pedido -> eventBus.request(Eventos.SALVAR_PEDIDO.toString(), Json.encode(pedido)).map(pedido))
+          .compose(pedido -> eventBus.request(Eventos.ENVIAR_PEDIDO_CRIADO.toString(), Json.encode(pedido)).map(pedido))
+          .compose(pedido -> {
+            vertx.setTimer(UM_MINUTO_TIMEOUT, idTimer -> eventBus.publish(Eventos.VERIFICAR_PEDIDO_CONFIRMADO.toString(), pedido.getId()));
+            return Future.succeededFuture(pedido);
+          })
+          .onSuccess(pedido -> novoPedidoHandler.reply(pedido.getId()))
           .onFailure(error -> montaRespostaDeErro(novoPedidoHandler, error));
       });
   }
