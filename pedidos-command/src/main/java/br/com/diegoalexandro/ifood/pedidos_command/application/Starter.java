@@ -1,11 +1,10 @@
 package br.com.diegoalexandro.ifood.pedidos_command.application;
 
 import br.com.diegoalexandro.ifood.pedidos_command.database.MongoDBClient;
-import br.com.diegoalexandro.ifood.pedidos_command.events.NovoPedidoSubscriber;
-import br.com.diegoalexandro.ifood.pedidos_command.events.RestauranteRecebidoSubscriber;
-import br.com.diegoalexandro.ifood.pedidos_command.events.SalvarPedidoSubscriber;
-import br.com.diegoalexandro.ifood.pedidos_command.events.VerificarTimeoutPedidoSubscriber;
+import br.com.diegoalexandro.ifood.pedidos_command.events.*;
 import br.com.diegoalexandro.ifood.pedidos_command.http.CriaEndpoints;
+import br.com.diegoalexandro.ifood.pedidos_command.kafka.PagamentoPedidoProducer;
+import br.com.diegoalexandro.ifood.pedidos_command.kafka.PedidoConfirmadoConsumer;
 import br.com.diegoalexandro.ifood.pedidos_command.kafka.PedidoCriadoProducer;
 import br.com.diegoalexandro.ifood.pedidos_command.kafka.RestauranteConsumer;
 import io.vertx.config.ConfigRetriever;
@@ -49,9 +48,12 @@ public class Starter {
         vertx.deployVerticle(NovoPedidoSubscriber.class.getName());
         vertx.deployVerticle(SalvarPedidoSubscriber.class.getName());
         vertx.deployVerticle(VerificarTimeoutPedidoSubscriber.class.getName());
+        vertx.deployVerticle(PedidoConfirmadoSubscriber.class.getName());
 
         vertx.deployVerticle(RestauranteConsumer.class.getName(), new DeploymentOptions().setConfig(config));
         vertx.deployVerticle(PedidoCriadoProducer.class.getName(), new DeploymentOptions().setConfig(config));
+        vertx.deployVerticle(PedidoConfirmadoConsumer.class.getName(), new DeploymentOptions().setConfig(config));
+        vertx.deployVerticle(PagamentoPedidoProducer.class.getName(), new DeploymentOptions().setConfig(config));
 
       });
   }

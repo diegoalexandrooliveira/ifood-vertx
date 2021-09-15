@@ -59,7 +59,6 @@ public class PedidoRepository {
 
     document.put("itens", itens);
 
-    log.info(document.toString());
     return MongoDBClient
       .getINSTANCE()
       .getClient()

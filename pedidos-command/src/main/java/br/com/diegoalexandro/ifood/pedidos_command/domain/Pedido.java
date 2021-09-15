@@ -57,4 +57,22 @@ public class Pedido {
     situacao = Situacao.PEDIDO_CANCELADO;
     adicionaHistorico(new HistoricoSituacao(ZonedDateTime.now(), Situacao.PEDIDO_CANCELADO));
   }
+
+  public boolean estaFinalizado() {
+    return situacao.equals(Situacao.PEDIDO_CANCELADO) ||
+      situacao.equals(Situacao.PEDIDO_FINALIZADO) ||
+      situacao.equals(Situacao.PAGAMENTO_RECUSADO) ||
+      situacao.equals(Situacao.PEDIDO_RECUSADO);
+  }
+
+  public boolean jaConfirmado() {
+    return historico
+      .stream()
+      .anyMatch(hist -> hist.getSituacao().equals(Situacao.PEDIDO_CONFIRMADO));
+  }
+
+  public void confirmar(ZonedDateTime dataConfirmacao) {
+    situacao = Situacao.PEDIDO_CONFIRMADO;
+    adicionaHistorico(new HistoricoSituacao(dataConfirmacao, Situacao.PEDIDO_CONFIRMADO));
+  }
 }

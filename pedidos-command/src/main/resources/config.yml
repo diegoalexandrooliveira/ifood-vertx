@@ -8,3 +8,5 @@ kafka:
   value-serializer: org.apache.kafka.common.serialization.StringSerializer
   restaurante-topic: Restaurantes
   pedido-criado-topic: PedidoCriado
+  pedido-confirmado-topic: PedidoConfirmado
+  pedido-pendente-pagamento-topic: PedidoPendentePagamento
