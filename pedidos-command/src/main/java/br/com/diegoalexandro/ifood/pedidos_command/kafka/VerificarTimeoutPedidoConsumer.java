@@ -27,13 +27,13 @@ public class VerificarTimeoutPedidoConsumer extends AbstractVerticle {
     final var consumer = getConsumer(config);
     final AtomicBoolean polling = new AtomicBoolean(false);
     consumer.subscribe(config.getString("verificar-timeout-pedido-topic"))
-      .onSuccess(assign -> vertx.setPeriodic(800, idPeriodic ->
+      .onSuccess(assign -> vertx.setPeriodic(500, idPeriodic ->
           {
             if (polling.get()) {
               return;
             }
             polling.set(true);
-            consumer.poll(Duration.ofMillis(500))
+            consumer.poll(Duration.ofMillis(1000))
               .onSuccess(kafkaHandler ->
                 {
                   if (kafkaHandler.isEmpty()) {

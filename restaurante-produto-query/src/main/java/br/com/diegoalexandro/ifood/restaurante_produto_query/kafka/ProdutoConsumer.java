@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -28,19 +29,34 @@ public class ProdutoConsumer extends AbstractVerticle {
   public void start() {
     final var config = vertx.getOrCreateContext().config().getJsonObject("kafka");
     final var consumer = getConsumer(config);
-    final var topicPartition = new TopicPartition();
-    topicPartition.setTopic(config.getString("produto-topic"));
-    consumer.assign(topicPartition)
-      .onSuccess(assign -> vertx.setPeriodic(800, idPeriodic ->
-          consumer.poll(Duration.ofMillis(500))
-            .onSuccess(kafkaHandler ->
-              consumer.pause(topicPartition)
-                .compose(paused -> getMensagens(kafkaHandler))
-                .compose(this::processaProdutos)
-                .compose(ignorado -> consumer.commit())
-                .onComplete(ignorado -> consumer.resume(topicPartition))
-            )
-            .onFailure(error -> log.error("Falha ao realizar o polling, tentando novamente.", error))
+    final AtomicBoolean polling = new AtomicBoolean(false);
+    consumer.subscribe(config.getString("produto-topic"))
+      .onSuccess(assign ->
+        vertx.setPeriodic(500, idPeriodic -> {
+            if (polling.get()) {
+              return;
+            }
+            polling.set(true);
+            consumer.poll(Duration.ofMillis(1000))
+              .onSuccess(kafkaHandler ->
+                {
+                  if (kafkaHandler.isEmpty()) {
+                    polling.set(false);
+                    return;
+                  }
+                  getMensagens(kafkaHandler)
+                    .compose(this::processaProdutos)
+                    .onComplete(ignorado -> {
+                      consumer.commit();
+                      polling.set(false);
+                    });
+                }
+              )
+              .onFailure(error -> {
+                log.error("Falha ao realizar o polling, tentando novamente.", error);
+                polling.set(false);
+              });
+          }
         )
       )
       .onFailure(error -> log.error("Falha ao se registrar no tópico.", error));
