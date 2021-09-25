@@ -1,5 +1,6 @@
 package br.com.diegoalexandro.ifood.pedidos_command.events;
 
+import br.com.diegoalexandro.ifood.pedidos_command.database.RedisClient;
 import br.com.diegoalexandro.ifood.pedidos_command.domain.CriarPedido;
 import br.com.diegoalexandro.ifood.pedidos_command.http.PedidoRequest;
 import br.com.diegoalexandro.ifood.pedidos_command.infra.RestauranteRepository;
@@ -11,6 +12,10 @@ import io.vertx.core.eventbus.ReplyFailure;
 import io.vertx.core.json.Json;
 import lombok.extern.slf4j.Slf4j;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -51,7 +56,10 @@ public class NovoPedidoSubscriber extends AbstractVerticle {
           .compose(pedido -> eventBus.request(Eventos.SALVAR_PEDIDO.toString(), Json.encode(pedido)).map(pedido))
           .compose(pedido -> eventBus.request(Eventos.ENVIAR_PEDIDO_CRIADO.toString(), Json.encode(pedido)).map(pedido))
           .compose(pedido -> {
-            vertx.setTimer(UM_MINUTO_TIMEOUT, idTimer -> eventBus.publish(Eventos.VERIFICAR_PEDIDO_CONFIRMADO.toString(), pedido.getId()));
+            final long delayTime = ZonedDateTime.now().withZoneSameInstant(ZoneId.of("UTC")).plus(UM_MINUTO_TIMEOUT, ChronoUnit.MILLIS).toEpochSecond();
+            RedisClient.getINSTANCE()
+                .getRedisAPI()
+                  .zadd(List.of("delayed_tasks", String.valueOf(delayTime), pedido.getId()));
             return Future.succeededFuture(pedido);
           })
           .onSuccess(pedido -> novoPedidoHandler.reply(pedido.getId()))

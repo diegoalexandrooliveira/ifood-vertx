@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Optional;
 
 @Slf4j
-public class VerificarTimeoutPedidoSubscriber extends AbstractVerticle {
+public class VerificarPedidoConfirmadoSubscriber extends AbstractVerticle {
 
   @Override
   public void start() {
@@ -24,14 +24,18 @@ public class VerificarTimeoutPedidoSubscriber extends AbstractVerticle {
           .map(Optional::orElseThrow)
           .compose(pedido -> {
             if (pedido.getSituacao().equals(Situacao.PEDIDO_CRIADO)) {
-              log.error("Pedido {} não foi confirmado, cancelando pedido.", idPedido);
+              log.warn("Pedido {} não foi confirmado, cancelando pedido.", idPedido);
               pedido.cancelar();
               return PedidoRepository.salvar(pedido);
             }
-            log.info("Pedido {} foi confirmado, nada a fazer.", idPedido);
+            log.info("Pedido {} teve a situação alterada, nada a fazer.", idPedido);
             return Future.succeededFuture();
           })
-          .onFailure(error -> log.error(error.getMessage(), error));
+          .onSuccess(handler -> pedidoHandler.reply(""))
+          .onFailure(error -> {
+            log.error(error.getMessage(), error);
+            pedidoHandler.fail(0, error.getMessage());
+          });
       });
   }
 }

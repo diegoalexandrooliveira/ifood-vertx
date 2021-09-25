@@ -1,5 +1,7 @@
 http:
-  port: 8083
+  port: 8085
+redis:
+  host: 172.17.0.1
 kafka:
   bootstrap-servers: 172.17.0.1:29092
   key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -10,3 +12,4 @@ kafka:
   pedido-criado-topic: PedidoCriado
   pedido-confirmado-topic: PedidoConfirmado
   pedido-pendente-pagamento-topic: PedidoPendentePagamento
+  verificar-timeout-pedido-topic: VerificarTimeoutPedidos
