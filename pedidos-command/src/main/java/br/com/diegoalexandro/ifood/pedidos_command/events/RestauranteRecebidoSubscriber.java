@@ -1,5 +1,6 @@
 package br.com.diegoalexandro.ifood.pedidos_command.events;
 
+import br.com.diegoalexandro.ifood.pedidos_command.application.VerticleService;
 import br.com.diegoalexandro.ifood.pedidos_command.domain.Restaurante;
 import br.com.diegoalexandro.ifood.pedidos_command.infra.RestauranteRepository;
 import io.vertx.core.AbstractVerticle;
@@ -7,6 +8,7 @@ import io.vertx.core.json.Json;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@VerticleService
 public class RestauranteRecebidoSubscriber extends AbstractVerticle {
 
   @Override

@@ -1,5 +1,5 @@
 http:
-  port: 8085
+  port: 8083
 redis:
   host: 172.17.0.1
 kafka:
@@ -11,5 +11,7 @@ kafka:
   restaurante-topic: Restaurantes
   pedido-criado-topic: PedidoCriado
   pedido-confirmado-topic: PedidoConfirmado
+  pedido-recusado-topic: PedidoRecusado
+  recusar-pedido-topic: RecusarPedido
   pedido-pendente-pagamento-topic: PedidoPendentePagamento
   verificar-timeout-pedido-topic: VerificarTimeoutPedidos

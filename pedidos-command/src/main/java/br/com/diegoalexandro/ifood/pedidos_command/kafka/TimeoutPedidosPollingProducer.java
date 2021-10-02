@@ -1,5 +1,6 @@
 package br.com.diegoalexandro.ifood.pedidos_command.kafka;
 
+import br.com.diegoalexandro.ifood.pedidos_command.application.VerticleService;
 import br.com.diegoalexandro.ifood.pedidos_command.database.RedisClient;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonObject;
@@ -17,6 +18,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
+@VerticleService
 public class TimeoutPedidosPollingProducer extends AbstractVerticle {
 
   private static final String LOCK_DELAYED_TASK = "lock_delayed_task";

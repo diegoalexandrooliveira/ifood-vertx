@@ -1,5 +1,6 @@
 package br.com.diegoalexandro.ifood.pedidos_command.kafka;
 
+import br.com.diegoalexandro.ifood.pedidos_command.application.VerticleService;
 import br.com.diegoalexandro.ifood.pedidos_command.domain.PedidoConfirmado;
 import br.com.diegoalexandro.ifood.pedidos_command.events.Eventos;
 import io.vertx.core.AbstractVerticle;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Slf4j
+@VerticleService
 public class PedidoConfirmadoConsumer extends AbstractVerticle {
 
   @Override

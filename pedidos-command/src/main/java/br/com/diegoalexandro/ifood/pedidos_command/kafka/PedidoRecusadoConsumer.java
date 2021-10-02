@@ -1,34 +1,37 @@
 package br.com.diegoalexandro.ifood.pedidos_command.kafka;
 
 import br.com.diegoalexandro.ifood.pedidos_command.application.VerticleService;
+import br.com.diegoalexandro.ifood.pedidos_command.domain.PedidoRecusado;
 import br.com.diegoalexandro.ifood.pedidos_command.events.Eventos;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
+import io.vertx.core.json.DecodeException;
+import io.vertx.core.json.Json;
 import io.vertx.core.json.JsonObject;
 import io.vertx.kafka.client.consumer.KafkaConsumer;
 import io.vertx.kafka.client.consumer.KafkaConsumerRecords;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Slf4j
 @VerticleService
-public class VerificarTimeoutPedidoConsumer extends AbstractVerticle {
+public class PedidoRecusadoConsumer extends AbstractVerticle {
 
   @Override
   public void start() {
     final var config = vertx.getOrCreateContext().config().getJsonObject("kafka");
     final var consumer = getConsumer(config);
     final AtomicBoolean polling = new AtomicBoolean(false);
-    consumer.subscribe(config.getString("verificar-timeout-pedido-topic"))
+    consumer.subscribe(config.getString("recusar-pedido-topic"))
       .onSuccess(assign -> vertx.setPeriodic(500, idPeriodic ->
           {
             if (polling.get()) {
@@ -60,20 +63,28 @@ public class VerificarTimeoutPedidoConsumer extends AbstractVerticle {
       .onFailure(error -> log.error("Falha ao se registrar no tópico.", error));
   }
 
-  private Future<Void> processaMensagens(final List<String> ids) {
-    final List<Future> pedidosConfirmados = ids
+  private Future<Void> processaMensagens(final List<PedidoRecusado> pedidos) {
+    final List<Future> pedidosRecusados = pedidos
       .stream()
-      .map(id -> vertx.eventBus().request(Eventos.VERIFICAR_PEDIDO_CONFIRMADO.toString(), id))
+      .map(pedido -> vertx.eventBus().request(Eventos.PEDIDO_RECUSADO.toString(), Json.encode(pedido)))
       .collect(Collectors.toList());
-    return CompositeFuture.join(pedidosConfirmados).mapEmpty();
+    return CompositeFuture.join(pedidosRecusados).mapEmpty();
   }
 
-  private Future<List<String>> getMensagens(final KafkaConsumerRecords<String, String> kafkaHandler) {
-    final List<String> ids = StreamSupport
+  private Future<List<PedidoRecusado>> getMensagens(final KafkaConsumerRecords<String, String> kafkaHandler) {
+    final List<PedidoRecusado> pedidos = StreamSupport
       .stream(kafkaHandler.records().spliterator(), false)
-      .map(ConsumerRecord::value)
+      .map(kafkaRecord -> {
+        try {
+          return Json.decodeValue(kafkaRecord.value(), PedidoRecusado.class);
+        } catch (DecodeException e) {
+          log.error("Falha ao de-serializar a mensagem: {}", kafkaRecord.value(), e);
+        }
+        return null;
+      })
+      .filter(Objects::nonNull)
       .collect(Collectors.toList());
-    return Future.succeededFuture(ids);
+    return Future.succeededFuture(pedidos);
   }
 
   private KafkaConsumer<String, String> getConsumer(final JsonObject config) {

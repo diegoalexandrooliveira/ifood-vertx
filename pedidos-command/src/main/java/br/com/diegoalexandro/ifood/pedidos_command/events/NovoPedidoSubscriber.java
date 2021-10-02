@@ -1,5 +1,6 @@
 package br.com.diegoalexandro.ifood.pedidos_command.events;
 
+import br.com.diegoalexandro.ifood.pedidos_command.application.VerticleService;
 import br.com.diegoalexandro.ifood.pedidos_command.database.RedisClient;
 import br.com.diegoalexandro.ifood.pedidos_command.domain.CriarPedido;
 import br.com.diegoalexandro.ifood.pedidos_command.http.PedidoRequest;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Slf4j
+@VerticleService
 public class NovoPedidoSubscriber extends AbstractVerticle {
 
   public static final int UM_MINUTO_TIMEOUT = 60000;

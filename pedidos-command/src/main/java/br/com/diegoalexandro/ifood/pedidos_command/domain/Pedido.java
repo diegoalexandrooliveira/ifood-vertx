@@ -53,9 +53,14 @@ public class Pedido {
     itens.add(item);
   }
 
-  public void cancelar() {
+  public void cancelar(final String motivo) {
+    cancelar(ZonedDateTime.now(), motivo);
+  }
+
+  public void cancelar(final ZonedDateTime dataCancelamento,
+                       final String motivo) {
     situacao = Situacao.PEDIDO_CANCELADO;
-    adicionaHistorico(new HistoricoSituacao(ZonedDateTime.now(), Situacao.PEDIDO_CANCELADO));
+    adicionaHistorico(new HistoricoSituacao(dataCancelamento, Situacao.PEDIDO_CANCELADO, motivo));
   }
 
   public boolean estaFinalizado() {
@@ -73,6 +78,6 @@ public class Pedido {
 
   public void confirmar(ZonedDateTime dataConfirmacao) {
     situacao = Situacao.PEDIDO_CONFIRMADO;
-    adicionaHistorico(new HistoricoSituacao(dataConfirmacao, Situacao.PEDIDO_CONFIRMADO));
+    adicionaHistorico(new HistoricoSituacao(dataConfirmacao, Situacao.PEDIDO_CONFIRMADO, null));
   }
 }

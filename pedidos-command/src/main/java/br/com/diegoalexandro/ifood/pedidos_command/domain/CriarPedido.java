@@ -35,7 +35,7 @@ public class CriarPedido {
 
     final var pagamento = new Pagamento(pedidoRequest.getFormaDePagamento(), pedidoRequest.getIdCartaoCliente(), valorTotal);
 
-    final var historicoSituacao = new HistoricoSituacao(ZonedDateTime.now(), Situacao.PEDIDO_CRIADO);
+    final var historicoSituacao = new HistoricoSituacao(ZonedDateTime.now(), Situacao.PEDIDO_CRIADO, null);
 
     final Pedido pedido = new Pedido(idPedido, restaurante, pagamento, pedidoRequest.getIdCliente(), Situacao.PEDIDO_CRIADO);
 

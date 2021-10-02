@@ -2,13 +2,10 @@ package br.com.diegoalexandro.ifood.pedidos_command.application;
 
 import br.com.diegoalexandro.ifood.pedidos_command.database.MongoDBClient;
 import br.com.diegoalexandro.ifood.pedidos_command.database.RedisClient;
-import br.com.diegoalexandro.ifood.pedidos_command.events.*;
 import br.com.diegoalexandro.ifood.pedidos_command.http.CriaEndpoints;
-import br.com.diegoalexandro.ifood.pedidos_command.kafka.*;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.jackson.DatabindCodec;
@@ -44,19 +41,7 @@ public class Starter {
         RedisClient.build(vertx, config)
           .onFailure(error -> log.error("Falha ao conectar no Redis.", error));
 
-        vertx.deployVerticle(RestauranteRecebidoSubscriber.class.getName());
-        vertx.deployVerticle(NovoPedidoSubscriber.class.getName());
-        vertx.deployVerticle(SalvarPedidoSubscriber.class.getName());
-        vertx.deployVerticle(PedidoConfirmadoSubscriber.class.getName());
-        vertx.deployVerticle(VerificarPedidoConfirmadoSubscriber.class.getName());
-
-        vertx.deployVerticle(RestauranteConsumer.class.getName(), new DeploymentOptions().setConfig(config));
-        vertx.deployVerticle(PedidoCriadoProducer.class.getName(), new DeploymentOptions().setConfig(config));
-        vertx.deployVerticle(PedidoConfirmadoConsumer.class.getName(), new DeploymentOptions().setConfig(config));
-        vertx.deployVerticle(PagamentoPedidoProducer.class.getName(), new DeploymentOptions().setConfig(config));
-        vertx.deployVerticle(TimeoutPedidosPollingProducer.class.getName(), new DeploymentOptions().setConfig(config));
-        vertx.deployVerticle(VerificarTimeoutPedidoConsumer.class.getName(), new DeploymentOptions().setConfig(config));
-
+        LoadVerticles.load(vertx, config);
       });
   }
 

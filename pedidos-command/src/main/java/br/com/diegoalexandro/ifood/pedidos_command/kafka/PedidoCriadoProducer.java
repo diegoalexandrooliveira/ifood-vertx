@@ -1,5 +1,6 @@
 package br.com.diegoalexandro.ifood.pedidos_command.kafka;
 
+import br.com.diegoalexandro.ifood.pedidos_command.application.VerticleService;
 import br.com.diegoalexandro.ifood.pedidos_command.domain.Pedido;
 import br.com.diegoalexandro.ifood.pedidos_command.events.Eventos;
 import io.vertx.core.AbstractVerticle;
@@ -13,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
+@VerticleService
 public class PedidoCriadoProducer extends AbstractVerticle {
 
   @Override
@@ -22,14 +24,14 @@ public class PedidoCriadoProducer extends AbstractVerticle {
 
     var eventBus = vertx.eventBus();
     eventBus.<String>consumer(Eventos.ENVIAR_PEDIDO_CRIADO.toString())
-      .handler(produtoHandler -> {
-        final var pedido = Json.decodeValue(produtoHandler.body(), Pedido.class);
+      .handler(pedidoHandler -> {
+        final var pedido = Json.decodeValue(pedidoHandler.body(), Pedido.class);
         log.info("Enviando {}", pedido.toString());
         producer.send(KafkaProducerRecord.create(config.getString("pedido-criado-topic"), Json.encode(pedido)))
-          .onSuccess(success -> produtoHandler.reply(produtoHandler.body()))
+          .onSuccess(success -> pedidoHandler.reply(pedidoHandler.body()))
           .onFailure(error -> {
-            log.error("Erro ao enviar mensagem {}. {}", produtoHandler.body(), error.getMessage());
-            produtoHandler.fail(500, error.getMessage());
+            log.error("Erro ao enviar mensagem {}. {}", pedidoHandler.body(), error.getMessage());
+            pedidoHandler.fail(500, error.getMessage());
           });
       });
   }

@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Slf4j
 @VerticleService
-public class PagamentoPedidoProducer extends AbstractVerticle {
+public class PedidoRecusadoProducer extends AbstractVerticle {
 
   @Override
   public void start() {
@@ -23,15 +23,15 @@ public class PagamentoPedidoProducer extends AbstractVerticle {
     final KafkaProducer<String, String> producer = getProducer(config);
 
     var eventBus = vertx.eventBus();
-    eventBus.<String>consumer(Eventos.ENVIAR_PEDIDO_CONFIRMADO.toString())
-      .handler(produtoHandler -> {
-        final var pedido = Json.decodeValue(produtoHandler.body(), Pedido.class);
+    eventBus.<String>consumer(Eventos.ENVIAR_PEDIDO_RECUSADO.toString())
+      .handler(pedidoHandler -> {
+        final var pedido = Json.decodeValue(pedidoHandler.body(), Pedido.class);
         log.info("Enviando {}", pedido.toString());
-        producer.send(KafkaProducerRecord.create(config.getString("pedido-pendente-pagamento-topic"), Json.encode(pedido)))
-          .onSuccess(success -> produtoHandler.reply(produtoHandler.body()))
+        producer.send(KafkaProducerRecord.create(config.getString("pedido-recusado-topic"), Json.encode(pedido)))
+          .onSuccess(success -> pedidoHandler.reply(pedidoHandler.body()))
           .onFailure(error -> {
-            log.error("Erro ao enviar mensagem {}. {}", produtoHandler.body(), error.getMessage());
-            produtoHandler.fail(500, error.getMessage());
+            log.error("Erro ao enviar mensagem {}. {}", pedidoHandler.body(), error.getMessage());
+            pedidoHandler.fail(500, error.getMessage());
           });
       });
   }

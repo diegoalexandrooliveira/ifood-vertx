@@ -1,5 +1,6 @@
 package br.com.diegoalexandro.ifood.pedidos_command.events;
 
+import br.com.diegoalexandro.ifood.pedidos_command.application.VerticleService;
 import br.com.diegoalexandro.ifood.pedidos_command.domain.Situacao;
 import br.com.diegoalexandro.ifood.pedidos_command.infra.PedidoRepository;
 import io.vertx.core.AbstractVerticle;
@@ -9,7 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Optional;
 
 @Slf4j
+@VerticleService
 public class VerificarPedidoConfirmadoSubscriber extends AbstractVerticle {
+
+  private static final String MOTIVO_TIMEOUT = "Restaurante não respondeu ao pedido";
 
   @Override
   public void start() {
@@ -25,7 +29,7 @@ public class VerificarPedidoConfirmadoSubscriber extends AbstractVerticle {
           .compose(pedido -> {
             if (pedido.getSituacao().equals(Situacao.PEDIDO_CRIADO)) {
               log.warn("Pedido {} não foi confirmado, cancelando pedido.", idPedido);
-              pedido.cancelar();
+              pedido.cancelar(MOTIVO_TIMEOUT);
               return PedidoRepository.salvar(pedido);
             }
             log.info("Pedido {} teve a situação alterada, nada a fazer.", idPedido);
